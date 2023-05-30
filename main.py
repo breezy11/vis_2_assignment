@@ -1,72 +1,142 @@
-#to see visualization use: http://127.0.0.1:8050/
 from dash import Dash, dcc, html
 import plotly.express as px
-import plotly.express as px
-import plotly.graph_objs as go
-import plotly.offline as ply
 import pandas as pd
 import dash_bootstrap_components as dbc
-from dash import Input, Output, dcc, html, ctx
 
 app = Dash(__name__)
 
-cars = pd.read_csv("data/cars/cars.csv",index_col=0)
-ecoli = pd.read_csv("data/ecoli/ecoli.csv",index_col=0)
-wine = pd.read_csv("data/wine/wine.csv",index_col=0)
-glass = pd.read_csv("data/glass/glass.csv",index_col=0)
-iris = pd.read_csv("data/iris/iris.csv",index_col=0)
-seeds = pd.read_csv("data/seeds/seeds.csv",index_col=0)
+seeds_1_best = pd.read_csv("results/seeds/orderings-data-sets/seeds_1_best.csv", index_col=0)
+seeds_2_best = pd.read_csv("results/seeds/orderings-data-sets/seeds_2_best.csv", index_col=0)
+seeds_3_best = pd.read_csv("results/seeds/orderings-data-sets/seeds_3_best.csv", index_col=0)
+seeds_1_worst = pd.read_csv("results/seeds/orderings-data-sets/seeds_1_worst.csv", index_col=0)
+seeds_2_worst = pd.read_csv("results/seeds/orderings-data-sets/seeds_2_worst.csv", index_col=0)
+seeds_3_worst = pd.read_csv("results/seeds/orderings-data-sets/seeds_3_worst.csv", index_col=0)
 
-datasets_names = ['cars', 'ecoli', 'wine', 'glass', 'iris', 'seeds']
-datasets = [cars, ecoli, wine, glass, iris, seeds]
+print(seeds_3_best.shape)
 
-data_ = datasets[0]
-dimensions = data_.columns
+dimensions_1_best = seeds_1_best.columns
+dimensions_1_worst = seeds_1_worst.columns
 
-# parallel coordinate plot
-fig = px.parallel_coordinates(data_, dimensions=dimensions,
-                             color_continuous_scale=px.colors.diverging.Tealrose,
-                             color_continuous_midpoint=2)
-# app layout
+# Create parallel coordinate plots
+fig_1_best = px.parallel_coordinates(seeds_1_best, dimensions=dimensions_1_best,
+                               color_continuous_scale=px.colors.diverging.Tealrose,
+                               color_continuous_midpoint=2)
+
+fig_2_best = px.parallel_coordinates(seeds_2_best, dimensions=dimensions_1_best,
+                               color_continuous_scale=px.colors.diverging.Tealrose,
+                               color_continuous_midpoint=2)
+
+fig_3_best = px.parallel_coordinates(seeds_3_best, dimensions=dimensions_1_best,
+                               color_continuous_scale=px.colors.diverging.Tealrose,
+                               color_continuous_midpoint=2)
+
+fig_1_worst = px.parallel_coordinates(seeds_1_worst, dimensions=dimensions_1_worst,
+                               color_continuous_scale=px.colors.diverging.Tealrose,
+                               color_continuous_midpoint=2)
+
+fig_2_worst = px.parallel_coordinates(seeds_2_worst, dimensions=dimensions_1_worst,
+                               color_continuous_scale=px.colors.diverging.Tealrose,
+                               color_continuous_midpoint=2)
+
+fig_3_worst = px.parallel_coordinates(seeds_3_worst, dimensions=dimensions_1_worst,
+                               color_continuous_scale=px.colors.diverging.Tealrose,
+                               color_continuous_midpoint=2)
+
+# App layout
 app.layout = html.Div(
     children=[
         html.H2(
             children='Reordering Sets of Parallel Coordinates Plots to Highlight Differences in Clusters',
             style={'textAlign': 'center'}
         ),
-        html.H6(
-            children='Dario Jugo, Branimir Raguz',
+        html.H5(
+            children='Best orderings: [1, 0, 5, 4, 6, 2, 3], Total Distance Score: 0.4345727485543593',
             style={'textAlign': 'center'}
         ),
         html.Div(
+            className="row",
             children=[
-                dcc.Graph(
-                    id='parallel-coordinate',
-                    figure=fig,
-                    className='plot'
+                html.Div(
+                    className="col",
+                    children=[
+                        dcc.Graph(
+                            id='pcp_1_best',
+                            figure=fig_1_best,
+                            className='plot'
+                        )
+                    ]
+                ),
+                html.Div(
+                    className="col",
+                    children=[
+                        dcc.Graph(
+                            id='pcp_2_best',
+                            figure=fig_2_best,
+                            className='plot'
+                        )
+                    ]
+                ),
+                html.Div(
+                    className="col",
+                    children=[
+                        dcc.Graph(
+                            id='pcp_3_best',
+                            figure=fig_3_best,
+                            className='plot'
+                        )
+                    ]
                 )
             ]
         ),
+        html.H5(
+            children='Worst orderings: [4, 2, 0, 1, 3, 5, 6], Total Distance Score: 0.401919672665923',
+            style={'textAlign': 'center'}
+        ),
         html.Div(
+            className="row",
             children=[
-                html.H3(
-                    children='Select one of the datasets',
-                    style={'textAlign': 'center'}
+                html.Div(
+                    className="col",
+                    children=[
+                        dcc.Graph(
+                            id='pcp_1_worst',
+                            figure=fig_1_worst,
+                            className='plot'
+                        )
+                    ]
                 ),
-                dcc.Dropdown(
-                    options=datasets_names,
-                    value="cars",
-                    multi=False,
-                    id="dataset-selection"
+                html.Div(
+                    className="col",
+                    children=[
+                        dcc.Graph(
+                            id='pcp_2_worst',
+                            figure=fig_2_worst,
+                            className='plot'
+                        )
+                    ]
+                ),
+                html.Div(
+                    className="col",
+                    children=[
+                        dcc.Graph(
+                            id='pcp_3_worst',
+                            figure=fig_3_worst,
+                            className='plot'
+                        )
+                    ]
                 )
-            ],
-            style={'textAlign': 'center', 'margin': '20px'}
+            ]
         )
     ]
 )
 
+if __name__ == '__main__':
+    app.run_server(debug=True)
+
+
+### code for changin the data sets
 # Define the callback function
-@app.callback(
+"""@app.callback(
     Output('parallel-coordinate', 'figure'),
     Input('dataset-selection', 'value')
 )
@@ -82,5 +152,22 @@ def update_parallel_coordinate(selected_dataset_name):
 
     return fig
 
-if __name__ == '__main__':
-    app.run_server(debug=True)
+,
+        html.Div(
+            children=[
+                html.H3(
+                    children='Select one of the datasets',
+                    style={'textAlign': 'center'}
+                ),
+                dcc.Dropdown(
+                    options=datasets_names,
+                    value="cars",
+                    multi=False,
+                    id="dataset-selection"
+                )
+            ],
+            style={'textAlign': 'center', 'margin': '20px'}
+        )
+
+
+"""
