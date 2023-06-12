@@ -20,6 +20,11 @@ tds_glass = [1.602, 1.473]
 
 # App layout
 app.layout = html.Div(children=[
+    html.H2(
+            children='Reordering Sets of Parallel Coordinates Plots to Highlight Differences in Clusters',
+            style={'textAlign': 'center'}
+    ),
+    html.H4(children = 'Select the data set', style={'textAlign': 'center'}),
     dcc.Dropdown(
         id='my-dropdown',
         options=[
